@@ -207,169 +207,618 @@
   }
 
   // 引入 Pickr CSS
-  GM_addStyle(`@import url('https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.9.1/dist/themes/classic.min.css');`)
+  GM_addStyle(`@import url('https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.9.1/dist/themes/nano.min.css');`)
   GM_addStyle(`
-          .swal2-popup.swal2-modal.swal2-show{
-          color: #FFF;
-          border-radius: 20px;
-          background: #31b96c;
-          box-shadow:  8px 8px 16px #217e49,
-          -8px -8px 16px #41f48f;
-          #swal2-title a{
-          display: inline-block;
-          height: 40px;
-          margin-right: 10px;
-          border-radius: 10px;
-          overflow: hidden;
-          color: #fff;
-          }
-          #swal2-title {
-          display: flex !important;
-          justify-content: center;
-          align-items: center;
-          }
-          .row-box select {
-          border:unset;
-          border-radius: .15em;
-          }
-          .row-box {
-          display: flex;
-          margin: 25px;
-          align-items: center;
-          justify-content: space-between;
-          }
-          .row-box .swal2-input {
-          height: 40px;
-          }
-          .row-box label {
-          margin-right: 10px;
-          }
-          .row-box main input{
-          background: rgba(15, 172, 83, 1);
-          }
-          .row-box main {
-          display: flex;
-          align-items: center;
-          }
-          .row-box main input{
-          width: 70px;
-          border: unset;
-          box-shadow: unset;
-          text-align: right;
-          margin:0;
-          }
-      `)
+    /* 主弹窗样式 */
+    .swal2-popup.swal2-modal.swal2-show {
+      width: 680px !important;
+      max-width: 90vw;
+      padding: 0 !important;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+      border-radius: 24px !important;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+      color: #fff;
+    }
+
+    /* 标题区域 */
+    .swal2-title {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 24px 32px 16px !important;
+      margin: 0 !important;
+      font-size: 24px !important;
+      font-weight: 600 !important;
+      color: #fff !important;
+      background: transparent !important;
+    }
+
+    .swal2-title img {
+      width: 36px !important;
+      height: 36px !important;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .swal2-title a {
+      color: #fff !important;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .swal2-title a:hover {
+      opacity: 0.8;
+    }
+
+    /* 内容区域 */
+    .swal2-html-container {
+      margin: 0 !important;
+      padding: 0 !important;
+      max-height: 65vh;
+      overflow-y: auto;
+    }
+
+    /* 自定义滚动条 */
+    .swal2-html-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .swal2-html-container::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+
+    .swal2-html-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+    }
+
+    .swal2-html-container::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    /* 设置容器 */
+    .settings-container {
+      padding: 0 32px 24px;
+    }
+
+    /* 设置项卡片 */
+    .setting-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .setting-card:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 设置项标题 */
+    .setting-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #fff;
+    }
+
+    .setting-title-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .setting-title-text::before {
+      content: '';
+      width: 4px;
+      height: 16px;
+      background: #fff;
+      border-radius: 2px;
+    }
+
+    /* Toggle Switch */
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      cursor: pointer;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.3);
+      border-radius: 24px;
+      transition: 0.3s;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      background-color: rgba(76, 217, 100, 0.9);
+    }
+
+    .toggle-switch input:checked + .toggle-slider:before {
+      transform: translateX(20px);
+    }
+
+    /* 设置项内容 */
+    .setting-content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .setting-label {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .setting-label a {
+      color: #fff;
+      text-decoration: underline;
+    }
+
+    /* 颜色选择器容器 */
+    .color-picker-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .color-picker-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .color-picker-label {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .color-preview {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      cursor: pointer;
+      border: 3px solid rgba(255, 255, 255, 0.4);
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .color-preview:hover {
+      transform: scale(1.1);
+      border-color: rgba(255, 255, 255, 0.8);
+    }
+
+    .color-preview::after {
+      content: '✎';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 18px;
+      color: rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .color-preview:hover::after {
+      opacity: 1;
+    }
+
+    /* 输入框样式 */
+    .setting-input,
+    .setting-select {
+      background: rgba(255, 255, 255, 0.2) !important;
+      border: 1px solid rgba(255, 255, 255, 0.3) !important;
+      border-radius: 8px !important;
+      padding: 8px 12px !important;
+      color: #fff !important;
+      font-size: 14px !important;
+      transition: all 0.2s;
+      outline: none !important;
+      box-shadow: none !important;
+      margin: 0 !important;
+      height: auto !important;
+    }
+
+    .setting-input:focus,
+    .setting-select:focus {
+      background: rgba(255, 255, 255, 0.25) !important;
+      border-color: rgba(255, 255, 255, 0.5) !important;
+    }
+
+    .setting-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .setting-select option {
+      background: #667eea;
+      color: #fff;
+    }
+
+    /* 时间阈值输入组 */
+    .time-threshold-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .time-threshold-group .setting-input {
+      width: 80px;
+      text-align: center;
+    }
+
+    .time-threshold-group .setting-select {
+      width: 100px;
+    }
+
+    /* 范围滑块 */
+    .range-slider {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.2);
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .range-slider::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    /* 按钮区域 */
+    .swal2-actions {
+      padding: 16px 32px 24px !important;
+      margin: 0 !important;
+      gap: 12px !important;
+    }
+
+    .swal2-confirm,
+    .swal2-cancel {
+      border-radius: 12px !important;
+      padding: 12px 32px !important;
+      font-size: 15px !important;
+      font-weight: 600 !important;
+      border: none !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+      transition: all 0.2s !important;
+      margin: 0 !important;
+    }
+
+    .swal2-confirm {
+      background: rgba(76, 217, 100, 0.9) !important;
+      color: #fff !important;
+    }
+
+    .swal2-confirm:hover {
+      background: rgba(76, 217, 100, 1) !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .swal2-cancel {
+      background: rgba(255, 255, 255, 0.2) !important;
+      color: #fff !important;
+    }
+
+    .swal2-cancel:hover {
+      background: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    /* Pickr 样式覆盖 */
+    .pcr-app {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    /* 提示文本 */
+    .setting-hint {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.5;
+      margin-top: 8px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      border-left: 3px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .setting-hint a {
+      color: #fff;
+      text-decoration: underline;
+    }
+
+    /* 预设主题按钮组 */
+    .preset-themes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .preset-theme-btn {
+      padding: 12px;
+      border-radius: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .preset-theme-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .preset-theme-btn.active {
+      background: rgba(76, 217, 100, 0.3);
+      border-color: rgba(76, 217, 100, 0.8);
+    }
+
+    .preset-theme-colors {
+      display: flex;
+      gap: 4px;
+    }
+
+    .preset-theme-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+  `)
   const PanelDom = `
-              <div class="row-box">
-                  <label for="rpcPort">主题设置:</label>
-                  <main>
-                      <select tabindex="-1" id="THEME-select" class="swal2-input">
-                          <option value="light">light</option>
-                          <option value="dark">dark</option>
-                      </select>
-                  </main>
-              </div>
-              <div class="row-box">
-                  <label id="TIME_BOUNDARY-label" for="rpcPort">时间阈值:</label>
-                  <main>
-                      <input id="TIME_BOUNDARY-number" type="number" class="swal2-input" value="" maxlength="3" pattern="\d{1,3}">
-                      <select tabindex="-1" id="TIME_BOUNDARY-select" class="swal2-input">
-                          <option value="day">日</option>
-                          <option value="week">周</option>
-                          <option value="month">月</option>
-                          <option value="year">年</option>
-                      </select>
-                  </main>
-              </div>
-              <div class="row-box">
-                  <div>
-                      <label id="BGC-label">背景颜色:</label>
-                      <input type="checkbox" id="BGC-enabled">
-                  </div>
-                  <main>
-                      <span id="BGC-highlight-color-value">
-                          <div id="BGC-highlight-color-pickr"></div>
-                      </span>
-                      <span id="BGC-grey-color-value">
-                          <div id="BGC-grey-color-pickr"></div>
-                      </span>
-                  </main>
-              </div>
-              <div class="row-box">
-                  <div>
-                      <label id="FONT-label">字体颜色:</label>
-                      <input type="checkbox" id="FONT-enabled">
-                  </div>
-                  <main>
-                      <span id="FONT-highlight-color-value">
-                          <div id="FONT-highlight-color-pickr"></div>
-                      </span>
-                      <span id="FONT-grey-color-value">
-                          <div id="FONT-grey-color-pickr"></div>
-                      </span>
-                  </main>
-              </div>
+    <div class="settings-container">
+      <!-- 主题配置卡片 -->
+      <div class="setting-card">
+        <div class="setting-title">
+          <span class="setting-title-text">主题配置</span>
+          <select id="THEME-select" class="setting-select" style="width: 120px;">
+            <option value="light">浅色主题</option>
+            <option value="dark">深色主题</option>
+          </select>
+        </div>
+        <div class="setting-content">
+          <div class="setting-row">
+            <span class="setting-label">当前主题模式</span>
+            <select id="CURRENT_THEME-select" class="setting-select" style="width: 140px;">
+              <option value="auto">🌓 跟随系统</option>
+              <option value="light">☀️ 浅色</option>
+              <option value="dark">🌙 深色</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
-              <div class="row-box">
-                  <div>
-                      <label id="DIR-label">文件夹颜色:</label>
-                      <input type="checkbox" id="DIR-enabled">
-                  </div>
-                  <main>
-                      <span id="DIR-highlight-color-value">
-                          <div id="DIR-highlight-color-pickr"></div>
-                      </span>
-                      <span id="DIR-grey-color-value">
-                          <div id="DIR-grey-color-pickr"></div>
-                      </span>
-                  </main>
-              </div>
-              <div class="row-box">
-                  <div>
-                      <label id="TIME_FORMAT-label">时间格式化:</label>
-                      <input type="checkbox" id="TIME_FORMAT-enabled">
-                  </div>
-              </div>
-              <div class="row-box">
-                   <div>
-                      <label id="SORT-label">文件排序:</label>
-                      <input type="checkbox" id="SORT-enabled">
-                  </div>
-                  <main>
-                      <select tabindex="-1" id="SORT-select" class="swal2-input">
-                          <option value="asc">时间正序</option>
-                          <option value="desc">时间倒序</option>
-                      </select>
-                  </main>
-              </div>
+      <!-- 时间阈值卡片 -->
+      <div class="setting-card">
+        <div class="setting-title">
+          <span class="setting-title-text">⏰ 时间阈值</span>
+        </div>
+        <div class="setting-content">
+          <div class="setting-row">
+            <span class="setting-label">活跃度判断标准</span>
+            <div class="time-threshold-group">
+              <input id="TIME_BOUNDARY-number" type="number" class="setting-input" value="" min="1" max="999" />
+              <select id="TIME_BOUNDARY-select" class="setting-select">
+                <option value="day">天</option>
+                <option value="week">周</option>
+                <option value="month">月</option>
+                <option value="year">年</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
 
-              <div class="row-box">
-                  <label for="rpcPort">当前主题:</label>
-                  <main>
-                      <select tabindex="-1" id="CURRENT_THEME-select" class="swal2-input">
-                          <option value="auto">auto</option>
-                          <option value="light">light</option>
-                          <option value="dark">dark</option>
-                      </select>
-                  </main>
+      <!-- 颜色配置卡片 -->
+      <div class="setting-card">
+        <div class="setting-title">
+          <span class="setting-title-text">🎨 背景颜色</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="BGC-enabled" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-content">
+          <div class="color-picker-group">
+            <div class="color-picker-item">
+              <div class="color-picker-label">活跃色</div>
+              <div id="BGC-highlight-color-value">
+                <div class="color-preview" id="BGC-highlight-color-pickr" style="background: rgba(15, 172, 83, 1);"></div>
               </div>
-
-              <div class="row-box">
-                  <div>
-                      <label id="AWESOME-label"><a target="_blank" href="https://github.com/settings/tokens">AWESOME token: </a></label>
-                      <input type="checkbox" id="AWESOME-enabled">
-                  </div>
-                  <main>
-                      <input id="AWESOME_TOKEN" type="password" class="swal2-input" value="">
-                  </main>
+            </div>
+            <div class="color-picker-item">
+              <div class="color-picker-label">非活跃色</div>
+              <div id="BGC-grey-color-value">
+                <div class="color-preview" id="BGC-grey-color-pickr" style="background: rgba(245, 245, 245, 0.24);"></div>
               </div>
-            <p>当复选框切换到未勾选状态时，部分设置不会立即生效需重新刷新页面。AWESOME谨慎开启详细说明请看 <a target="_blank" href="https://docs.rational-stars.top/diy-settings/awesome-xxx.html"> 文档ℹ️</><p/>
+            </div>
+          </div>
+        </div>
+      </div>
 
-          `
+      <div class="setting-card">
+        <div class="setting-title">
+          <span class="setting-title-text">✏️ 字体颜色</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="FONT-enabled" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-content">
+          <div class="color-picker-group">
+            <div class="color-picker-item">
+              <div class="color-picker-label">活跃色</div>
+              <div id="FONT-highlight-color-value">
+                <div class="color-preview" id="FONT-highlight-color-pickr" style="background: rgba(252, 252, 252, 1);"></div>
+              </div>
+            </div>
+            <div class="color-picker-item">
+              <div class="color-picker-label">非活跃色</div>
+              <div id="FONT-grey-color-value">
+                <div class="color-preview" id="FONT-grey-color-pickr" style="background: rgba(0, 0, 0, 1);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-card">
+        <div class="setting-title">
+          <span class="setting-title-text">📁 文件夹颜色</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="DIR-enabled" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-content">
+          <div class="color-picker-group">
+            <div class="color-picker-item">
+              <div class="color-picker-label">活跃色</div>
+              <div id="DIR-highlight-color-value">
+                <div class="color-preview" id="DIR-highlight-color-pickr" style="background: rgba(15, 172, 83, 1);"></div>
+              </div>
+            </div>
+            <div class="color-picker-item">
+              <div class="color-picker-label">非活跃色</div>
+              <div id="DIR-grey-color-value">
+                <div class="color-preview" id="DIR-grey-color-pickr" style="background: rgba(154, 154, 154, 1);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 功能开关卡片 -->
+      <div class="setting-card">
+        <div class="setting-title">
+          <span class="setting-title-text">⚙️ 功能设置</span>
+        </div>
+        <div class="setting-content">
+          <div class="setting-row">
+            <span class="setting-label">📅 时间格式化</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="TIME_FORMAT-enabled" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="setting-row">
+            <span class="setting-label">🔄 文件排序</span>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <label class="toggle-switch">
+                <input type="checkbox" id="SORT-enabled" />
+                <span class="toggle-slider"></span>
+              </label>
+              <select id="SORT-select" class="setting-select" style="width: 120px;">
+                <option value="asc">时间正序</option>
+                <option value="desc">时间倒序</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AWESOME 功能卡片 -->
+      <div class="setting-card">
+        <div class="setting-title">
+          <span class="setting-title-text">⭐ Awesome 增强</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="AWESOME-enabled" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-content">
+          <div class="setting-row">
+            <span class="setting-label">
+              <a target="_blank" href="https://github.com/settings/tokens">GitHub Token</a>
+            </span>
+            <input id="AWESOME_TOKEN" type="password" class="setting-input" placeholder="ghp_xxxxxxxxxx" style="width: 240px;" />
+          </div>
+          <div class="setting-hint">
+            💡 启用后可为 Awesome 列表自动获取 star 数和更新时间。需要 GitHub Personal Access Token。
+            <a target="_blank" href="https://docs.rational-stars.top/diy-settings/awesome-xxx.html">查看详细文档</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 提示信息 -->
+      <div class="setting-hint" style="margin-top: 8px;">
+        ⚠️ 部分设置（如开关）切换到关闭状态时，需要刷新页面才能完全生效。
+      </div>
+    </div>
+  `
   // === 配置项 ===
   let default_THEME = {
     BGC: {
-      highlightColor: 'rgba(15, 172, 83, 1)', // 高亮颜色（示例：金色）
+      highlightColor: 'rgba(173, 216, 230, 0.7)', // 高亮颜色（淡蓝色，70%透明度）
       greyColor: 'rgba(245, 245, 245, 0.24)', // 灰色（示例：深灰）
       isEnabled: true, // 是否启用背景色
     },
@@ -389,7 +838,7 @@
     },
     SORT: {
       select: 'desc', // 排序方式（可能的值："asc", "desc"）
-      isEnabled: true, // 是否启用排序
+      isEnabled: false, // 是否启用排序（默认关闭）
     },
     AWESOME: {
       isEnabled: false, // AWESOME项目是否启用
@@ -407,91 +856,178 @@
   let THEME = config_JSON[THEME_TYPE] // 当前主题
 
   const configPickr = {
-    theme: 'monolith', // 使用经典主题
+    theme: 'nano', // 使用 nano 主题，更简洁
     components: {
       preview: true,
       opacity: true,
       hue: true,
       interaction: {
         rgba: true,
-        // hex: true,
-        // hsla: true,
-        // hsva: true,
-        // cmyk: true,
         input: true,
         clear: true,
         save: true,
       },
     },
   }
+
+  // 存储所有 Pickr 实例
+  const pickrInstances = []
+  // 存储 selector -> Pickr 实例的映射,用于在保存时获取颜色
+  const pickrInstanceMap = {}
+
   function getThemeType() {
     let themeType = CURRENT_THEME
     if (CURRENT_THEME === 'auto') {
       if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        // console.log('当前系统是深色模式 🌙')
         themeType = 'dark'
       } else {
-        // console.log('当前系统是浅色模式 ☀️')
         themeType = 'light'
       }
     }
     window.console.log("%c✅向前：" + "如果您觉得GitHub-freshscan好用，点击下方 github链接 给个 star 吧。非常感谢你！！！\n[https://github.com/CzsGit/github-fresh-scan]", "color:green")
     return themeType
   }
-  function initPickr(el_default) {
-    const pickr = Pickr.create({ ...configPickr, ...el_default })
-    watchPickr(pickr)
-  }
-  function watchPickr(pickrName, el) {
-    pickrName.on('save', (color, instance) => {
-      pickrName.hide()
+
+  function initPickr(selector, defaultColor) {
+    const el = document.querySelector(selector)
+    if (!el) return null
+
+    const pickr = Pickr.create({
+      el: el,
+      theme: 'nano',
+      default: defaultColor,
+      swatches: [
+        'rgba(15, 172, 83, 1)',
+        'rgba(252, 252, 252, 1)',
+        'rgba(154, 154, 154, 1)',
+        'rgba(245, 245, 245, 0.24)',
+        'rgba(0, 0, 0, 1)',
+        '#667eea',
+        '#764ba2',
+        '#f093fb',
+        '#4facfe',
+      ],
+      components: {
+        preview: true,
+        opacity: true,
+        hue: true,
+        interaction: {
+          rgba: true,
+          input: true,
+          clear: true,
+          save: true,
+        },
+      },
     })
+
+    // 监听颜色变化事件 - 实时更新预览和 data-color
+    pickr.on('change', (color, instance) => {
+      if (color) {
+        const colorString = color.toRGBA().toString()
+        el.style.background = colorString
+        el.setAttribute('data-color', colorString)
+      }
+    })
+
+    // 监听保存事件 - 点击 Save 按钮时
+    pickr.on('save', (color, instance) => {
+      if (color) {
+        const colorString = color.toRGBA().toString()
+        el.style.background = colorString
+        el.setAttribute('data-color', colorString)
+      }
+      // 不自动隐藏,让用户可以继续调整
+    })
+
+    // 监听隐藏事件 - 关闭 Pickr 时保存当前颜色
+    pickr.on('hide', (instance) => {
+      const color = pickr.getColor()
+      if (color) {
+        const colorString = color.toRGBA().toString()
+        el.style.background = colorString
+        el.setAttribute('data-color', colorString)
+      }
+    })
+
+    // 存储到实例数组和映射表
+    pickrInstances.push(pickr)
+    pickrInstanceMap[selector] = pickr
+
+    return pickr
+  }
+
+  // 清理所有 Pickr 实例
+  function destroyAllPickr() {
+    pickrInstances.forEach(pickr => {
+      if (pickr) pickr.destroyAndRemove()
+    })
+    pickrInstances.length = 0
+    // 清空映射表
+    for (let key in pickrInstanceMap) {
+      delete pickrInstanceMap[key]
+    }
   }
   const preConfirm = () => {
     // 遍历默认主题配置，更新设置
-    const updated_THEME = getUpdatedThemeConfig(default_THEME)
+    const updated_THEME = getUpdatedThemeConfig()
     CURRENT_THEME = $('#CURRENT_THEME-select').val()
     AWESOME_TOKEN = $('#AWESOME_TOKEN').val()
+
+    const selectedThemeType = $('#THEME-select').val()
+
+    // 更新 config_JSON
+    const newConfigJSON = {
+      ...config_JSON,
+      [selectedThemeType]: updated_THEME,
+    }
+
     // 保存到油猴存储
-    GM_setValue(
-      'config_JSON',
-      JSON.stringify({
-        ...config_JSON,
-        [$('#THEME-select').val()]: updated_THEME,
-      })
-    )
+    GM_setValue('config_JSON', JSON.stringify(newConfigJSON))
     GM_setValue('CURRENT_THEME', CURRENT_THEME)
     GM_setValue('AWESOME_TOKEN', AWESOME_TOKEN)
-    THEME = updated_THEME // 更新当前主题
-    GitHub_freshscan(updated_THEME)
+
+    // 更新全局变量
+    Object.assign(config_JSON, newConfigJSON)
+    THEME_TYPE = getThemeType()
+    THEME = config_JSON[THEME_TYPE]
+
+    console.log('[GitHub freshscan] 配置已保存:', {
+      THEME_TYPE,
+      updated_THEME,
+      CURRENT_THEME,
+    })
+
+    // 重新执行扫描以应用新设置
+    resetProcessedElements()
+    GitHub_freshscan(THEME)
+
     Swal.fire({
       position: 'top-center',
-      background: '#4ab96f',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       icon: 'success',
       title: '设置已保存',
       showConfirmButton: false,
-      timer: 800,
+      timer: 1000,
     })
   }
   function initSettings(theme) {
-    initPickr({
-      el: '#BGC-highlight-color-pickr',
-      default: theme.BGC.highlightColor,
-    })
-    initPickr({ el: '#BGC-grey-color-pickr', default: theme.BGC.greyColor })
-    initPickr({
-      el: '#FONT-highlight-color-pickr',
-      default: theme.FONT.highlightColor,
-    })
-    initPickr({ el: '#FONT-grey-color-pickr', default: theme.FONT.greyColor })
-    initPickr({
-      el: '#DIR-highlight-color-pickr',
-      default: theme.DIR.highlightColor,
-    })
-    initPickr({ el: '#DIR-grey-color-pickr', default: theme.DIR.greyColor })
+    // 清理之前的 Pickr 实例
+    destroyAllPickr()
+
+    // 初始化所有颜色选择器
+    initPickr('#BGC-highlight-color-pickr', theme.BGC.highlightColor)
+    initPickr('#BGC-grey-color-pickr', theme.BGC.greyColor)
+    initPickr('#FONT-highlight-color-pickr', theme.FONT.highlightColor)
+    initPickr('#FONT-grey-color-pickr', theme.FONT.greyColor)
+    initPickr('#DIR-highlight-color-pickr', theme.DIR.highlightColor)
+    initPickr('#DIR-grey-color-pickr', theme.DIR.greyColor)
+
+    // 设置选择器值
     $('#THEME-select').val(getThemeType())
     $('#CURRENT_THEME-select').val(CURRENT_THEME)
     $('#AWESOME_TOKEN').val(AWESOME_TOKEN)
+
+    // 填充表单数据
     handelData(theme)
   }
   function getUpdatedThemeConfig() {
@@ -505,28 +1041,46 @@
       for (let [key, val] of Object.entries(themeVal)) {
         switch (key) {
           case 'highlightColor':
-            // 获取高亮颜色（示例：金色、道奇蓝等）
-            val = $(`#${themeKey}-highlight-color-value .pcr-button`).css(
-              '--pcr-color'
-            )
+            // 优先从 Pickr 实例获取颜色
+            const highlightSelector = `#${themeKey}-highlight-color-pickr`
+            const highlightPickr = pickrInstanceMap[highlightSelector]
+
+            if (highlightPickr) {
+              const color = highlightPickr.getColor()
+              val = color ? color.toRGBA().toString() : val
+            } else {
+              // 回退方案：从 DOM 元素获取
+              const highlightEl = document.querySelector(highlightSelector)
+              val = highlightEl ? (highlightEl.getAttribute('data-color') || highlightEl.style.background || val) : val
+            }
             break
+
           case 'greyColor':
-            // 获取灰色调（示例：深灰、标准灰、暗灰等）
-            val = $(`#${themeKey}-grey-color-value .pcr-button`).css(
-              '--pcr-color'
-            )
+            // 优先从 Pickr 实例获取颜色
+            const greySelector = `#${themeKey}-grey-color-pickr`
+            const greyPickr = pickrInstanceMap[greySelector]
+
+            if (greyPickr) {
+              const color = greyPickr.getColor()
+              val = color ? color.toRGBA().toString() : val
+            } else {
+              // 回退方案：从 DOM 元素获取
+              const greyEl = document.querySelector(greySelector)
+              val = greyEl ? (greyEl.getAttribute('data-color') || greyEl.style.background || val) : val
+            }
             break
+
           case 'isEnabled':
             // 判断该主题项是否启用
             val = $(`#${themeKey}-enabled`).prop('checked')
             break
           case 'number':
             // 获取时间阈值（示例：30）
-            val = $(`#${themeKey}-number`).val()
+            val = parseInt($(`#${themeKey}-number`).val()) || val
             break
           case 'select':
             // 获取时间单位（可能的值："day", "week", "month"）
-            val = $(`#${themeKey}-select`).val()
+            val = $(`#${themeKey}-select`).val() || val
             break
           default:
             // 其他未定义的情况
@@ -545,16 +1099,20 @@
       for (const [key, val] of Object.entries(themeVal)) {
         switch (key) {
           case 'highlightColor':
-            $(`#${themeKey}-highlight-color-value .pcr-button`).css(
-              '--pcr-color',
-              val
-            )
+            // 设置颜色预览背景
+            const highlightEl = document.querySelector(`#${themeKey}-highlight-color-pickr`)
+            if (highlightEl) {
+              highlightEl.style.background = val
+              highlightEl.setAttribute('data-color', val)
+            }
             break
           case 'greyColor':
-            $(`#${themeKey}-grey-color-value .pcr-button`).css(
-              '--pcr-color',
-              val
-            )
+            // 设置颜色预览背景
+            const greyEl = document.querySelector(`#${themeKey}-grey-color-pickr`)
+            if (greyEl) {
+              greyEl.style.background = val
+              greyEl.setAttribute('data-color', val)
+            }
             break
           case 'isEnabled':
             $(`#${themeKey}-enabled`).prop('checked', val) // 选中
@@ -962,32 +1520,25 @@
 
           if (rowElement.length > 0) {
             trRows.push(rowElement[0])
+
+            // 背景色 - 应用到整行
+            setElementBGC(rowElement, theme.BGC, timeResult)
+
+            // 查找文件夹和文件图标 SVG - 添加更多备用选择器
+            let DIR_element = rowElement.find('svg[aria-label*="Directory"], svg[aria-label*="目录"]');
+            let FILE_element = rowElement.find('svg[aria-label*="File"], svg[aria-label*="文件"]');
+
+            // 如果没找到，尝试通过类名或其他属性查找
+            if (DIR_element.length === 0 && FILE_element.length === 0) {
+              DIR_element = rowElement.find('svg.octicon-file-directory');
+              FILE_element = rowElement.find('svg.octicon-file');
+            }
+
+            // 文件夹颜色和文件图标
+            setElementDIR(DIR_element, theme.DIR, timeResult)
+            setElementDIR(FILE_element, theme.DIR, timeResult)
           }
 
-          // 背景颜色和字体 - 尝试多种选择器
-          let BGC_element = $(this).closest('div[role="gridcell"]');
-          if (BGC_element.length === 0) {
-            BGC_element = $(this).closest('td');
-          }
-          if (BGC_element.length === 0) {
-            BGC_element = $(this).parent();
-          }
-
-          // 查找文件夹和文件图标 SVG - 添加更多备用选择器
-          let DIR_element = rowElement.find('svg[aria-label*="Directory"], svg[aria-label*="目录"]');
-          let FILE_element = rowElement.find('svg[aria-label*="File"], svg[aria-label*="文件"]');
-
-          // 如果没找到，尝试通过类名或其他属性查找
-          if (DIR_element.length === 0 && FILE_element.length === 0) {
-            DIR_element = rowElement.find('svg.octicon-file-directory');
-            FILE_element = rowElement.find('svg.octicon-file');
-          }
-
-          // 背景色
-          setElementBGC(BGC_element, theme.BGC, timeResult)
-          // 文件夹颜色和文件图标
-          setElementDIR(DIR_element, theme.DIR, timeResult)
-          setElementDIR(FILE_element, theme.DIR, timeResult)
           // 时间格式化
           setElementTIME_FORMAT($(this), theme.TIME_FORMAT, datetime)
           // 字体颜色
@@ -1363,6 +1914,14 @@
 
   // === 使用油猴菜单显示/隐藏设置面板 ===
   GM_registerMenuCommand('⚙️ 设置面板', createSettingsPanel)
+
+  // 临时：重置配置到默认值
+  GM_registerMenuCommand('🔄 重置为默认配置', () => {
+    GM_setValue('config_JSON', JSON.stringify({ light: default_THEME, dark: default_THEME }))
+    GM_setValue('CURRENT_THEME', 'light')
+    GM_setValue('AWESOME_TOKEN', '')
+    location.reload()
+  })
   // 监听主题变化
   window
     .matchMedia('(prefers-color-scheme: dark)')
