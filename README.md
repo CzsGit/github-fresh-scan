@@ -1,6 +1,5 @@
 # GitHub Fresh Scan
 
-[简体中文](#简体中文) · [English](#english)
 
 <p align="center">
   <a href="#简体中文">
