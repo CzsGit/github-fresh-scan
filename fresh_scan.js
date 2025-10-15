@@ -639,19 +639,22 @@
       <!-- 主题配置卡片 -->
       <div class="setting-card">
         <div class="setting-title">
-          <span class="setting-title-text">主题配置</span>
-          <select id="THEME-select" class="setting-select" style="width: 120px;">
-            <option value="light">浅色主题</option>
-            <option value="dark">深色主题</option>
-          </select>
+          <span class="setting-title-text">🎯 主题配置</span>
         </div>
         <div class="setting-content">
           <div class="setting-row">
+            <span class="setting-label">编辑主题方案</span>
+            <select id="THEME-select" class="setting-select" style="width: 140px;">
+              <option value="light">☀️ 浅色主题</option>
+              <option value="dark">🌙 深色主题</option>
+            </select>
+          </div>
+          <div class="setting-row">
             <span class="setting-label">当前主题模式</span>
-            <select id="CURRENT_THEME-select" class="setting-select" style="width: 140px;">
+            <select id="CURRENT_THEME-select" class="setting-select" style="width: 160px;">
               <option value="auto">🌓 跟随系统</option>
-              <option value="light">☀️ 浅色</option>
-              <option value="dark">🌙 深色</option>
+              <option value="light">☀️ 始终浅色</option>
+              <option value="dark">🌙 始终深色</option>
             </select>
           </div>
         </div>
@@ -849,9 +852,42 @@
   let CURRENT_THEME = GM_getValue('CURRENT_THEME', 'light')
   let AWESOME_TOKEN = GM_getValue('AWESOME_TOKEN', '')
   let THEME_TYPE = getThemeType()
+  const default_DARK_THEME = {
+    BGC: {
+      highlightColor: 'rgba(255, 153, 0, 0.28)',
+      greyColor: 'rgba(8, 20, 30, 0.65)',
+      isEnabled: true,
+    },
+    TIME_BOUNDARY: { number: 30, select: 'day' },
+    FONT: {
+      highlightColor: 'rgba(255, 244, 232, 1)',
+      greyColor: 'rgba(143, 167, 191, 1)',
+      isEnabled: true,
+    },
+    DIR: {
+      highlightColor: 'rgba(255, 204, 102, 1)',
+      greyColor: 'rgba(96, 125, 139, 1)',
+      isEnabled: true,
+    },
+    SORT: { select: 'desc', isEnabled: false },
+    AWESOME: { isEnabled: false },
+    TIME_FORMAT: { isEnabled: true },
+  }
+
   const config_JSON = JSON.parse(
-    GM_getValue('config_JSON', JSON.stringify({ light: default_THEME }))
+    GM_getValue('config_JSON', JSON.stringify({
+      light: default_THEME,
+      dark: default_DARK_THEME,
+    }))
   )
+
+  if (!config_JSON.light) {
+    config_JSON.light = JSON.parse(JSON.stringify(default_THEME))
+  }
+
+  if (!config_JSON.dark) {
+    config_JSON.dark = JSON.parse(JSON.stringify(default_DARK_THEME))
+  }
   let THEME = config_JSON[THEME_TYPE] // 当前主题
 
   const configPickr = {
@@ -898,7 +934,7 @@
       swatches: [
         'rgba(224, 116, 0, 1)',
         'rgba(252, 252, 252, 1)',
-        'rgba(154, 154, 154, 1)',
+        'rgba(143, 167, 191, 1)',
         'rgba(10, 40, 0, 0.59)',
         'rgba(0, 0, 0, 1)',
         '#667eea',
@@ -1104,6 +1140,10 @@
               highlightEl.style.background = val
               highlightEl.setAttribute('data-color', val)
             }
+            const highlightPickrInstance = pickrInstanceMap[`#${themeKey}-highlight-color-pickr`]
+            if (highlightPickrInstance) {
+              highlightPickrInstance.setColor(val, true)
+            }
             break
           case 'greyColor':
             // 设置颜色预览背景
@@ -1111,6 +1151,10 @@
             if (greyEl) {
               greyEl.style.background = val
               greyEl.setAttribute('data-color', val)
+            }
+            const greyPickrInstance = pickrInstanceMap[`#${themeKey}-grey-color-pickr`]
+            if (greyPickrInstance) {
+              greyPickrInstance.setColor(val, true)
             }
             break
           case 'isEnabled':
@@ -1144,10 +1188,22 @@
     initSettings(THEME)
 
     $('#THEME-select').on('change', function () {
-      let selectedTheme = $(this).val() // 获取选中的值
-      let theme = config_JSON[selectedTheme]
+      const selectedTheme = $(this).val()
+      const theme = config_JSON[selectedTheme] || (selectedTheme === 'dark' ? default_DARK_THEME : default_THEME)
       console.log('主题设置变更:', selectedTheme)
       handelData(theme)
+    })
+
+    $('#CURRENT_THEME-select').on('change', function () {
+      CURRENT_THEME = $(this).val()
+      GM_setValue('CURRENT_THEME', CURRENT_THEME)
+      THEME_TYPE = getThemeType()
+      $('#THEME-select').val(THEME_TYPE)
+      const activeTheme = config_JSON[THEME_TYPE] || (THEME_TYPE === 'dark' ? default_DARK_THEME : default_THEME)
+      handelData(activeTheme)
+      THEME = activeTheme
+      resetProcessedElements()
+      GitHub_freshscan(THEME)
     })
   }
   function setElementBGC(el, BGC, timeResult) {
