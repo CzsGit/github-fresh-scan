@@ -4,7 +4,7 @@
 // @version      1.0.0
 // @description  通过颜色高亮的方式，帮助你快速判断一个 GitHub 仓库是否在更新。
 // @author       https://github.com/CzsGit/github-fresh-scan 
-// @license      MIT
+// @license      Apache License 2.0
 // @icon         https://raw.githubusercontent.com/rational-stars/picgo/refs/heads/main/avatar.jpg
 // @match        https://github.com/*/*
 // @match        https://github.com/*
