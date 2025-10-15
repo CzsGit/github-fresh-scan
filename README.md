@@ -2,6 +2,21 @@
 
 [简体中文](#简体中文) · [English](#english)
 
+<p align="center">
+  <a href="https://github.com/CzsGit/github-fresh-scan/raw/main/fresh_scan.js">
+    <img alt="Install via Tampermonkey" src="https://img.shields.io/badge/Tampermonkey-Install%20Now-ff7e00?logo=monkeytype&logoColor=white" />
+  </a>
+  <a href="https://github.com/CzsGit/github-fresh-scan/releases">
+    <img alt="Latest Release" src="https://img.shields.io/github/v/release/CzsGit/github-fresh-scan?label=Release&logo=github" />
+  </a>
+  <a href="https://github.com/CzsGit/github-fresh-scan/stargazers">
+    <img alt="GitHub stars" src="https://img.shields.io/github/stars/CzsGit/github-fresh-scan?style=flat&label=Stars&logo=github" />
+  </a>
+  <a href="https://github.com/CzsGit/github-fresh-scan/blob/main/LICENSE">
+    <img alt="License" src="https://img.shields.io/github/license/CzsGit/github-fresh-scan?color=4caf50" />
+  </a>
+</p>
+
 ---
 
 <div align="center">
