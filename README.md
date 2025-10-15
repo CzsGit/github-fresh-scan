@@ -3,6 +3,12 @@
 [简体中文](#简体中文) · [English](#english)
 
 <p align="center">
+  <a href="#简体中文">
+    <img alt="简体中文" src="https://img.shields.io/badge/语言-简体中文-1abc9c?logo=googletranslate&logoColor=white" />
+  </a>
+  <a href="#english">
+    <img alt="English" src="https://img.shields.io/badge/Language-English-2980b9?logo=googletranslate&logoColor=white" />
+  </a>
   <a href="https://github.com/CzsGit/github-fresh-scan/raw/main/fresh_scan.js">
     <img alt="Install via Tampermonkey" src="https://img.shields.io/badge/Tampermonkey-Install%20Now-ff7e00?logo=monkeytype&logoColor=white" />
   </a>
