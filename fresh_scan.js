@@ -5,7 +5,7 @@
 // @description  通过颜色高亮的方式，帮助你快速判断一个 GitHub 仓库是否在更新。
 // @author       https://github.com/CzsGit/github-fresh-scan 
 // @license      Apache License 2.0
-// @icon         https://raw.githubusercontent.com/rational-stars/picgo/refs/heads/main/avatar.jpg
+// @icon         https://avatars.githubusercontent.com/u/16255872?v=4
 // @match        https://github.com/*/*
 // @match        https://github.com/*
 // @match        https://github.com/search?*
@@ -692,13 +692,13 @@
             <div class="color-picker-item">
               <div class="color-picker-label">活跃色</div>
               <div id="BGC-highlight-color-value">
-                <div class="color-preview" id="BGC-highlight-color-pickr" style="background: rgba(15, 172, 83, 1);"></div>
+                <div class="color-preview" id="BGC-highlight-color-pickr" style="background: rgba(224, 116, 0, 1);"></div>
               </div>
             </div>
             <div class="color-picker-item">
               <div class="color-picker-label">非活跃色</div>
               <div id="BGC-grey-color-value">
-                <div class="color-preview" id="BGC-grey-color-pickr" style="background: rgba(245, 245, 245, 0.24);"></div>
+                <div class="color-preview" id="BGC-grey-color-pickr" style="background: rgba(10, 40, 0, 0.59);"></div>
               </div>
             </div>
           </div>
@@ -804,7 +804,6 @@
           </div>
           <div class="setting-hint">
             💡 启用后可为 Awesome 列表自动获取 star 数和更新时间。需要 GitHub Personal Access Token。
-            <a target="_blank" href="https://docs.rational-stars.top/diy-settings/awesome-xxx.html">查看详细文档</a>
           </div>
         </div>
       </div>
@@ -818,8 +817,8 @@
   // === 配置项 ===
   let default_THEME = {
     BGC: {
-      highlightColor: 'rgba(173, 216, 230, 0.7)', // 高亮颜色（淡蓝色，70%透明度）
-      greyColor: 'rgba(245, 245, 245, 0.24)', // 灰色（示例：深灰）
+      highlightColor: 'rgba(224, 116, 0, 1)', // 高亮颜色
+      greyColor: 'rgba(10, 40, 0, 0.59)', // 灰色（示例：深灰）
       isEnabled: true, // 是否启用背景色
     },
     TIME_BOUNDARY: {
@@ -884,7 +883,7 @@
         themeType = 'light'
       }
     }
-    window.console.log("%c✅向前：" + "如果您觉得GitHub-freshscan好用，点击下方 github链接 给个 star 吧。非常感谢你！！！\n[https://github.com/CzsGit/github-fresh-scan]", "color:green")
+    window.console.log("如果您觉得GitHub-freshscan好用，点击下方 github链接 给个 star 吧。非常感谢你！！！\n[https://github.com/CzsGit/github-fresh-scan]", "color:green")
     return themeType
   }
 
@@ -897,10 +896,10 @@
       theme: 'nano',
       default: defaultColor,
       swatches: [
-        'rgba(15, 172, 83, 1)',
+        'rgba(224, 116, 0, 1)',
         'rgba(252, 252, 252, 1)',
         'rgba(154, 154, 154, 1)',
-        'rgba(245, 245, 245, 0.24)',
+        'rgba(10, 40, 0, 0.59)',
         'rgba(0, 0, 0, 1)',
         '#667eea',
         '#764ba2',
@@ -1132,7 +1131,7 @@
   // === 创建设置面板 ===
   function createSettingsPanel() {
     Swal.fire({
-      title: `<a target="_blank" tabindex="-1" id="swal2-title-div" href="https://home.rational-stars.top/"><img src="https://raw.githubusercontent.com/rational-stars/picgo/refs/heads/main/avatar.jpg" alt="向前" width="40"></a><a tabindex="-1" target="_blank" href="https://github.com/CzsGit/github-fresh-scan">GitHub freshscan 设置</a>`,
+      title: `<a target="_blank" tabindex="-1" id="swal2-title-div" href="https://github.com/CzsGit/github-fresh-scan"><img src="https://avatars.githubusercontent.com/u/16255872?v=4" alt="CzsGit" width="40"></a><a tabindex="-1" target="_blank" href="https://github.com/CzsGit/github-fresh-scan">GitHub freshscan 设置</a>`,
       html: PanelDom,
       focusConfirm: false,
       preConfirm,
@@ -1171,13 +1170,25 @@
     }
   }
   function setElementTIME_FORMAT(el, TIME_FORMAT, datetime) {
-    if (TIME_FORMAT.isEnabled && el.css('display') !== 'none') {
-      el.css('display', 'none')
-      const formattedDate = formatDate(datetime)
-      el.before(`<span>${formattedDate}</span>`)
-    } else if (TIME_FORMAT.isEnabled === false) {
-      el.parent().find('span').remove()
-      el.css('display', 'block')
+    if (!datetime) return;
+    const spanSelector = `span[${TIME_SPAN_ATTR}="true"]`;
+
+    if (TIME_FORMAT.isEnabled) {
+      const formattedDate = formatDate(datetime);
+      let formattedSpan = el.prev(spanSelector);
+
+      if (formattedSpan.length === 0) {
+        el.css('display', 'none');
+        el.before(`<span ${TIME_SPAN_ATTR}="true">${formattedDate}</span>`);
+      } else {
+        formattedSpan.text(formattedDate);
+      }
+    } else {
+      const formattedSpan = el.prev(spanSelector);
+      if (formattedSpan.length > 0) {
+        formattedSpan.remove();
+      }
+      el.css('display', '');
     }
   }
   // 设置字体颜色
@@ -1254,6 +1265,22 @@
   let processedElements = new WeakSet(); // 记录已处理的元素
   let mutationObserver = null; // MutationObserver 实例
   let pollingInterval = null; // 轮询检查定时器
+  const STATUS_ACTIVE = 'freshscan-active';
+  const STATUS_STALE = 'freshscan-stale';
+  const STATUS_ATTR = 'data-freshscan-status';
+  const TIME_SPAN_ATTR = 'data-freshscan-time';
+
+  function normalizeColorValue(color) {
+    if (!color) return '';
+    if (!document.body) return color;
+    const temp = document.createElement('div');
+    temp.style.display = 'none';
+    temp.style.backgroundColor = color;
+    document.body.appendChild(temp);
+    const computed = window.getComputedStyle(temp).backgroundColor;
+    temp.remove();
+    return computed || color;
+  }
 
   // === 使用更稳定的选择器查找元素 ===
   function findRelativeTimeElements() {
@@ -1289,41 +1316,31 @@
     }
 
     timeElements.each(function () {
+      const $timeElement = $(this);
       const element = this;
-      const titleAttr = $(this).attr('title');
-
-      // 检查是否已处理过
-      if (processedElements.has(element)) {
-        return;
-      }
-
+      const titleAttr = $timeElement.attr('title');
       if (!titleAttr) return;
 
-      // 解析时间字符串（格式："Oct 15, 2025, 1:40 PM GMT+8"）
       const timeDate = parseSearchPageTime(titleAttr);
-
       if (!timeDate) {
         console.warn('[GitHub fresh] 无法解析时间:', titleAttr);
         return;
       }
 
-      // 标记为已处理
-      processedElements.add(element);
-
-      // 判断时间是否在阈值内
       const timeResult = handelTime(timeDate.toISOString(), theme.TIME_BOUNDARY);
+      const expectedStatus = timeResult ? STATUS_ACTIVE : STATUS_STALE;
 
       // 查找搜索结果项的容器 - 向上查找到搜索结果项
-      let BGC_element = $(this).closest('div[data-testid="results-list"] > div').first();
+      let BGC_element = $timeElement.closest('div[data-testid="results-list"] > div').first();
 
       if (BGC_element.length === 0) {
         // 备选：查找包含搜索结果的父容器
-        BGC_element = $(this).closest('li.Box-sc-g0xbh4-0');
+        BGC_element = $timeElement.closest('li.Box-sc-g0xbh4-0');
       }
 
       if (BGC_element.length === 0) {
         // 最后的 fallback：查找最近的搜索结果容器
-        const searchResultItem = $(this).closest('div').filter(function() {
+        const searchResultItem = $timeElement.closest('div').filter(function() {
           return $(this).find('h3').length > 0 || $(this).find('a[href*="github.com"]').length > 0;
         }).first();
 
@@ -1331,6 +1348,32 @@
           BGC_element = searchResultItem;
         }
       }
+
+      const containerStatus = BGC_element.length > 0 ? BGC_element.attr(STATUS_ATTR) : null;
+      const currentStatus = $timeElement.attr(STATUS_ATTR);
+
+      let needsUpdate = !processedElements.has(element) || currentStatus !== expectedStatus || containerStatus !== expectedStatus;
+
+      if (!needsUpdate && theme.BGC.isEnabled && BGC_element.length > 0) {
+        const expectedBg = normalizeColorValue(timeResult ? theme.BGC.highlightColor : theme.BGC.greyColor);
+        const currentBg = BGC_element.css('background-color');
+        if (expectedBg && currentBg !== expectedBg) {
+          needsUpdate = true;
+        }
+      }
+
+      if (!needsUpdate && theme.TIME_FORMAT.isEnabled) {
+        const formattedSpan = $timeElement.find(`span[${TIME_SPAN_ATTR}="true"]`).first();
+        if (formattedSpan.length === 0) {
+          needsUpdate = true;
+        }
+      }
+
+      if (!needsUpdate) {
+        return;
+      }
+
+      processedElements.add(element);
 
       console.log(`[GitHub freshs can] 处理时间元素:`, {
         time: titleAttr,
@@ -1342,17 +1385,25 @@
       // 背景色 - 应用到整个搜索结果项
       if (BGC_element.length > 0) {
         setElementBGC(BGC_element, theme.BGC, timeResult);
+        BGC_element.attr(STATUS_ATTR, expectedStatus);
       }
 
       // 字体颜色 - 应用到时间元素本身
-      setElementFONT($(this), theme.FONT, timeResult);
+      setElementFONT($timeElement, theme.FONT, timeResult);
 
       // 时间格式化（可选）
       if (theme.TIME_FORMAT.isEnabled && timeDate) {
         const formattedDate = DateTime.fromJSDate(timeDate).toFormat('yyyy-MM-dd');
-        // 只修改显示的文本，保留 title 属性
-        $(this).find('span').first().text(formattedDate);
+        const firstSpan = $timeElement.find('span').first();
+        if (firstSpan.length > 0) {
+          firstSpan.text(formattedDate);
+          firstSpan.attr(TIME_SPAN_ATTR, 'true');
+        } else {
+          $timeElement.text(formattedDate);
+        }
       }
+
+      $timeElement.attr(STATUS_ATTR, expectedStatus);
     });
 
     console.log(`[GitHub freshscan] 搜索页面处理完成，共处理 ${timeElements.length} 个元素`);
@@ -1364,44 +1415,65 @@
     if (elements.length === 0) return
 
     elements.each(function () {
-      const datetime = $(this).attr('datetime');
-      const element = this;
-
-      // 检查是否已处理过
-      if (processedElements.has(element)) {
+      const $timeElement = $(this);
+      const datetime = $timeElement.attr('datetime');
+      if (!datetime || !isValidDatetime(datetime)) {
         return;
       }
 
-      // 验证 datetime 是否有效
-      if (datetime && isValidDatetime(datetime)) {
-        // 标记为已处理
-        processedElements.add(element);
+      const element = this;
+      const timeResult = handelTime(datetime, theme.TIME_BOUNDARY);
+      const expectedStatus = timeResult ? STATUS_ACTIVE : STATUS_STALE;
 
-        const timeResult = handelTime(datetime, theme.TIME_BOUNDARY);
+      const repoItem = $timeElement.closest('div[id^="user-repositories-list"]').length > 0
+        ? $timeElement.closest('li')
+        : $timeElement.closest('div');
 
-        // 查找仓库项的父容器
-        const repoItem = $(this).closest('div[id^="user-repositories-list"]').length > 0
-          ? $(this).closest('li')
-          : $(this).closest('div');
+      const repoStatus = repoItem.length > 0 ? repoItem.attr(STATUS_ATTR) : null;
+      const currentStatus = $timeElement.attr(STATUS_ATTR);
 
-        // 背景色 - 应用到整个仓库项
-        if (repoItem.length > 0 && theme.BGC.isEnabled) {
+      let needsUpdate = !processedElements.has(element) || currentStatus !== expectedStatus || repoStatus !== expectedStatus;
+
+      if (!needsUpdate && theme.BGC.isEnabled && repoItem.length > 0) {
+        const expectedBg = normalizeColorValue(timeResult ? theme.BGC.highlightColor : theme.BGC.greyColor);
+        const currentBg = repoItem.css('background-color');
+        if (expectedBg && currentBg !== expectedBg) {
+          needsUpdate = true;
+        }
+      }
+
+      if (!needsUpdate && theme.TIME_FORMAT.isEnabled) {
+        const formattedSpan = $timeElement.prev(`span[${TIME_SPAN_ATTR}="true"]`);
+        if (formattedSpan.length === 0) {
+          needsUpdate = true;
+        }
+      }
+
+      if (!needsUpdate) {
+        return;
+      }
+
+      processedElements.add(element);
+
+      // 背景色 - 应用到整个仓库项
+      if (repoItem.length > 0) {
+        if (theme.BGC.isEnabled) {
           if (timeResult) {
             repoItem[0].style.setProperty('background-color', theme.BGC.highlightColor, 'important');
           } else {
             repoItem[0].style.setProperty('background-color', theme.BGC.greyColor, 'important');
           }
         }
-
-        // 字体颜色
-        setElementFONT($(this), theme.FONT, timeResult);
-
-        // 时间格式化
-        if (theme.TIME_FORMAT.isEnabled) {
-          const formattedDate = formatDate(datetime);
-          $(this).text(formattedDate);
-        }
+        repoItem.attr(STATUS_ATTR, expectedStatus);
       }
+
+      // 字体颜色
+      setElementFONT($timeElement, theme.FONT, timeResult);
+
+      // 时间格式化
+      setElementTIME_FORMAT($timeElement, theme.TIME_FORMAT, datetime);
+
+      $timeElement.attr(STATUS_ATTR, expectedStatus);
     })
   }
 
@@ -1493,58 +1565,82 @@
       let trRows = []
       let newElementsFound = false;
 
-      elements.each(function (index) {
-        const datetime = $(this).attr('datetime')
+      elements.each(function () {
+        const $timeElement = $(this);
+        const datetime = $timeElement.attr('datetime');
+        if (!datetime || !isValidDatetime(datetime)) {
+          return;
+        }
+
         const element = this;
+        const timeResult = handelTime(datetime, theme.TIME_BOUNDARY);
+        const expectedStatus = timeResult ? STATUS_ACTIVE : STATUS_STALE;
 
-        // 检查是否已处理过
-        if (processedElements.has(element)) {
-          return; // 跳过已处理的元素
+        // 使用更通用的方式查找行容器
+        let rowElement = $timeElement.closest('div[role="row"]');
+
+        // 如果没找到 role="row"，尝试其他方式
+        if (rowElement.length === 0) {
+          rowElement = $timeElement.closest('tr');
         }
 
-        // 验证 datetime 是否有效
-        if (datetime && isValidDatetime(datetime)) {
-          // 标记为已处理
-          processedElements.add(element);
-          newElementsFound = true;
+        const rowStatus = rowElement.length > 0 ? rowElement.attr(STATUS_ATTR) : null;
+        const currentStatus = $timeElement.attr(STATUS_ATTR);
 
-          const timeResult = handelTime(datetime, theme.TIME_BOUNDARY)
+        let needsUpdate = !processedElements.has(element) || currentStatus !== expectedStatus || rowStatus !== expectedStatus;
 
-          // 使用更通用的方式查找行容器
-          let rowElement = $(this).closest('div[role="row"]');
-
-          // 如果没找到 role="row"，尝试其他方式
-          if (rowElement.length === 0) {
-            rowElement = $(this).closest('tr');
+        if (!needsUpdate && theme.BGC.isEnabled && rowElement.length > 0) {
+          const expectedBg = normalizeColorValue(timeResult ? theme.BGC.highlightColor : theme.BGC.greyColor);
+          const currentBg = rowElement.css('background-color');
+          if (expectedBg && currentBg !== expectedBg) {
+            needsUpdate = true;
           }
-
-          if (rowElement.length > 0) {
-            trRows.push(rowElement[0])
-
-            // 背景色 - 应用到整行
-            setElementBGC(rowElement, theme.BGC, timeResult)
-
-            // 查找文件夹和文件图标 SVG - 添加更多备用选择器
-            let DIR_element = rowElement.find('svg[aria-label*="Directory"], svg[aria-label*="目录"]');
-            let FILE_element = rowElement.find('svg[aria-label*="File"], svg[aria-label*="文件"]');
-
-            // 如果没找到，尝试通过类名或其他属性查找
-            if (DIR_element.length === 0 && FILE_element.length === 0) {
-              DIR_element = rowElement.find('svg.octicon-file-directory');
-              FILE_element = rowElement.find('svg.octicon-file');
-            }
-
-            // 文件夹颜色和文件图标
-            setElementDIR(DIR_element, theme.DIR, timeResult)
-            setElementDIR(FILE_element, theme.DIR, timeResult)
-          }
-
-          // 时间格式化
-          setElementTIME_FORMAT($(this), theme.TIME_FORMAT, datetime)
-          // 字体颜色
-          setElementFONT($(this).parent(), theme.FONT, timeResult)
         }
-      })
+
+        if (!needsUpdate && theme.TIME_FORMAT.isEnabled) {
+          const formattedSpan = $timeElement.prev(`span[${TIME_SPAN_ATTR}="true"]`);
+          if (formattedSpan.length === 0) {
+            needsUpdate = true;
+          }
+        }
+
+        if (!needsUpdate) {
+          return;
+        }
+
+        processedElements.add(element);
+        newElementsFound = true;
+
+        if (rowElement.length > 0) {
+          if (!trRows.includes(rowElement[0])) {
+            trRows.push(rowElement[0]);
+          }
+
+          // 背景色 - 应用到整行
+          setElementBGC(rowElement, theme.BGC, timeResult);
+          rowElement.attr(STATUS_ATTR, expectedStatus);
+
+          // 查找文件夹和文件图标 SVG - 添加更多备用选择器
+          let DIR_element = rowElement.find('svg[aria-label*="Directory"], svg[aria-label*="目录"]');
+          let FILE_element = rowElement.find('svg[aria-label*="File"], svg[aria-label*="文件"]');
+
+          // 如果没找到，尝试通过类名或其他属性查找
+          if (DIR_element.length === 0 && FILE_element.length === 0) {
+            DIR_element = rowElement.find('svg.octicon-file-directory');
+            FILE_element = rowElement.find('svg.octicon-file');
+          }
+
+          // 文件夹颜色和文件图标
+          setElementDIR(DIR_element, theme.DIR, timeResult);
+          setElementDIR(FILE_element, theme.DIR, timeResult);
+        }
+
+        // 时间格式化
+        setElementTIME_FORMAT($timeElement, theme.TIME_FORMAT, datetime);
+        // 字体颜色
+        setElementFONT($timeElement.parent(), theme.FONT, timeResult);
+        $timeElement.attr(STATUS_ATTR, expectedStatus);
+      });
 
       // 文件排序 - 只在有新元素时才排序
       if (newElementsFound && theme.SORT.isEnabled && trRows.length > 0) {
@@ -1676,7 +1772,7 @@
   }
 
   // 等待DOM完全加载的辅助函数
-  function waitForElements(selector, callback, maxAttempts = 10, isSearchPage = false) {
+  function waitForElements(selector, callback, maxAttempts = 10, isSearchPage = false, timeoutCallback = null) {
     let attempts = 0;
     const checkInterval = setInterval(() => {
       const elements = $(selector);
@@ -1719,6 +1815,10 @@
           callback();
         } else if (attempts >= maxAttempts) {
           console.log(`[GitHub freshscan] 达到最大尝试次数 (${maxAttempts}), 未找到有效元素`);
+          // 调用兜底回调（如果提供）
+          if (timeoutCallback) {
+            timeoutCallback();
+          }
         }
       }
     }, 200); // 每200ms检查一次
@@ -1730,7 +1830,7 @@
     isProcessing = false;
   }
 
-  // 轮询检查新元素（用于搜索页面和首次加载）
+  // 持久化智能轮询检查新元素
   function startPollingCheck() {
     // 清除之前的轮询
     if (pollingInterval) {
@@ -1738,49 +1838,157 @@
     }
 
     let pollCount = 0;
-    const maxPolls = 15; // 最多轮询15次（15秒）
+    let successfulProcessCount = 0; // 成功处理元素的次数
     const matchedUrl = isMatchedUrl();
+    const startTime = Date.now();
 
-    pollingInterval = setInterval(() => {
+    const intelligentPoll = () => {
       pollCount++;
+      const elapsedSeconds = (Date.now() - startTime) / 1000;
 
       let hasUnprocessed = false;
+      let elementsFound = 0;
 
       // 根据页面类型使用不同的选择器
       if (matchedUrl === 'matchSearchPage') {
         // 搜索页面：检查 title 属性中的时间
         const elements = $('div.prc-Truncate-Truncate-A9Wn6[title*="GMT"], span.Text__StyledText-sc-1klmep6-0[title*="GMT"]');
+        elementsFound = elements.length;
         elements.each(function() {
-          const title = $(this).attr('title');
-          if (title && title.includes('GMT') && !processedElements.has(this)) {
+          const $timeElement = $(this);
+          const title = $timeElement.attr('title');
+          if (!title || !title.includes('GMT')) {
+            return;
+          }
+
+          const timeDate = parseSearchPageTime(title);
+          if (!timeDate) {
+            return;
+          }
+
+          const timeResult = handelTime(timeDate.toISOString(), THEME.TIME_BOUNDARY);
+          const expectedStatus = timeResult ? STATUS_ACTIVE : STATUS_STALE;
+          const currentStatus = $timeElement.attr(STATUS_ATTR);
+
+          // 查找容器并比对背景
+          let container = $timeElement.closest('div[data-testid="results-list"] > div').first();
+          if (container.length === 0) {
+            container = $timeElement.closest('li.Box-sc-g0xbh4-0');
+          }
+          if (container.length === 0) {
+            container = $timeElement.closest('div').filter(function() {
+              return $(this).find('h3').length > 0 || $(this).find('a[href*="github.com"]').length > 0;
+            }).first();
+          }
+
+          const containerStatus = container.length > 0 ? container.attr(STATUS_ATTR) : null;
+          const formattedSpan = $timeElement.find(`span[${TIME_SPAN_ATTR}="true"]`).first();
+
+          let needsUpdate = !processedElements.has(this) || currentStatus !== expectedStatus || containerStatus !== expectedStatus;
+
+          if (!needsUpdate && THEME.BGC.isEnabled && container.length > 0) {
+            const expectedBg = normalizeColorValue(timeResult ? THEME.BGC.highlightColor : THEME.BGC.greyColor);
+            const currentBg = container.css('background-color');
+            if (expectedBg && currentBg !== expectedBg) {
+              needsUpdate = true;
+            }
+          }
+
+          if (!needsUpdate && THEME.TIME_FORMAT.isEnabled && formattedSpan.length === 0) {
+            needsUpdate = true;
+          }
+
+          if (needsUpdate) {
             hasUnprocessed = true;
-            return false; // 跳出循环
+            return false;
           }
         });
       } else {
-        // 其他页面：检查 datetime 属性
+        // 仓库文件页或 Repositories 页面：检查 datetime 属性
         const elements = $('relative-time[datetime]');
+        elementsFound = elements.length;
         elements.each(function() {
-          const datetime = $(this).attr('datetime');
-          if (datetime && isValidDatetime(datetime) && !processedElements.has(this)) {
+          const $timeElement = $(this);
+          const datetime = $timeElement.attr('datetime');
+          if (!datetime || !isValidDatetime(datetime)) {
+            return;
+          }
+
+          const timeResult = handelTime(datetime, THEME.TIME_BOUNDARY);
+          const expectedStatus = timeResult ? STATUS_ACTIVE : STATUS_STALE;
+
+          const currentStatus = $timeElement.attr(STATUS_ATTR);
+
+          let container = $timeElement.closest('div[role="row"]');
+          if (container.length === 0) {
+            container = $timeElement.closest('tr');
+          }
+          if (container.length === 0 && matchedUrl === 'matchReposPage') {
+                container = $timeElement.closest('div[id^="user-repositories-list"]').length > 0
+                  ? $timeElement.closest('li')
+                  : $timeElement.closest('div');
+          }
+
+          const containerStatus = container.length > 0 ? container.attr(STATUS_ATTR) : null;
+          const formattedSpan = $timeElement.prev(`span[${TIME_SPAN_ATTR}="true"]`);
+
+          let needsUpdate = !processedElements.has(this) || currentStatus !== expectedStatus || containerStatus !== expectedStatus;
+
+          if (!needsUpdate && THEME.BGC.isEnabled && container.length > 0) {
+            const expectedBg = normalizeColorValue(timeResult ? THEME.BGC.highlightColor : THEME.BGC.greyColor);
+            const currentBg = container.css('background-color');
+            if (expectedBg && currentBg !== expectedBg) {
+              needsUpdate = true;
+            }
+          }
+
+          if (!needsUpdate && THEME.TIME_FORMAT.isEnabled && formattedSpan.length === 0) {
+            needsUpdate = true;
+          }
+
+          if (needsUpdate) {
             hasUnprocessed = true;
-            return false; // 跳出循环
+            return false;
           }
         });
       }
 
       if (hasUnprocessed && !isProcessing) {
-        console.log(`[GitHub freshscan] 轮询检测到新元素 (轮询 ${pollCount}/${maxPolls})`);
+        console.log(`[GitHub freshscan] 智能轮询检测到新元素 (第 ${pollCount} 次, 已${elapsedSeconds.toFixed(1)}秒)`);
         GitHub_freshscan();
+        successfulProcessCount++;
+
+        // 如果连续3次成功处理了元素，说明页面已稳定，可以停止高频轮询
+        if (successfulProcessCount >= 3 && elementsFound > 0) {
+          console.log('[GitHub freshscan] 页面已稳定，停止智能轮询');
+          clearInterval(pollingInterval);
+          pollingInterval = null;
+          return;
+        }
       }
 
-      // 达到最大轮询次数后停止
-      if (pollCount >= maxPolls) {
-        console.log('[GitHub freshscan] 轮询检查结束');
-        clearInterval(pollingInterval);
-        pollingInterval = null;
+      // 智能调整轮询间隔
+      let nextInterval;
+      if (elapsedSeconds < 30) {
+        nextInterval = 1000; // 前30秒：每1秒（高频）
+      } else if (elapsedSeconds < 60) {
+        nextInterval = 2000; // 30-60秒：每2秒（中频）
+      } else {
+        nextInterval = 5000; // 60秒后：每5秒（低频持久化）
       }
-    }, 1000); // 每秒检查一次
+
+      // 重新设置下次轮询
+      clearInterval(pollingInterval);
+      pollingInterval = setTimeout(intelligentPoll, nextInterval);
+
+      // 每10次轮询输出一次状态
+      if (pollCount % 10 === 0) {
+        console.log(`[GitHub freshscan] 持久化轮询进行中... (第 ${pollCount} 次, 已${elapsedSeconds.toFixed(1)}秒, 找到${elementsFound}个元素)`);
+      }
+    };
+
+    // 启动智能轮询
+    intelligentPoll();
   }
 
   const runScript = () => {
@@ -1788,23 +1996,26 @@
     if (!matchedUrl) return;
 
     // 根据页面类型设置不同的等待策略
-    let maxAttempts = 30; // 默认6秒
+    let maxAttempts = 60; // 默认12秒（增加到60次）
     let isSearchOrRepos = false;
     let needsPolling = false;
     let selector = 'relative-time[datetime]'; // 默认选择器
 
     if (matchedUrl === 'matchSearchPage') {
-      maxAttempts = 50; // 搜索页面等待10秒
+      maxAttempts = 80; // 搜索页面等待16秒（从50增加到80）
       isSearchOrRepos = true;
       needsPolling = true;
       // 搜索页面使用新的选择器
       selector = 'div.prc-Truncate-Truncate-A9Wn6[title*="GMT"], span.Text__StyledText-sc-1klmep6-0[title*="GMT"]';
       console.log('[GitHub freshscan] 检测到搜索页面，使用扩展等待时间并启动轮询');
     } else if (matchedUrl === 'matchReposPage') {
-      maxAttempts = 40; // Repositories 页面等待8秒
+      maxAttempts = 70; // Repositories 页面等待14秒（从40增加到70）
       isSearchOrRepos = true;
       needsPolling = true;
       console.log('[GitHub freshscan] 检测到 Repositories 页面，使用扩展等待时间并启动轮询');
+    } else if (matchedUrl === 'matchRepoPage') {
+      needsPolling = true;
+      console.log('[GitHub freshscan] 检测到仓库文件页面，启动持久化轮询');
     }
 
     // 等待元素出现
@@ -1820,7 +2031,11 @@
           }
         }, 100);
       });
-    }, maxAttempts, isSearchOrRepos);
+    }, maxAttempts, isSearchOrRepos, () => {
+      // 达到最大尝试次数后的兜底回调：强制启动持久化轮询
+      console.log('[GitHub freshscan] waitForElements 超时，启动兜底持久化轮询');
+      startPollingCheck();
+    });
   };
 
   // 页面加载完成后执行
@@ -1879,34 +2094,52 @@
     // 检查变化是否与文件列表相关
     let shouldRun = false;
     for (const mutation of mutations) {
-      // 检查是否有添加了 relative-time 或文件列表相关的节点
+      // 检查节点新增
       if (mutation.addedNodes.length > 0) {
         for (const node of mutation.addedNodes) {
           if (node.nodeType === 1) { // Element node
             if (node.querySelector &&
                 (node.querySelector('relative-time[datetime]') ||
                  node.querySelector('div[role="row"]') ||
-                 node.matches && node.matches('relative-time[datetime]'))) {
+                 node.querySelector('div[title*="GMT"]') || // 搜索页面的时间元素
+                 node.matches && (node.matches('relative-time[datetime]') ||
+                                  node.matches('div[title*="GMT"]')))) {
               shouldRun = true;
+              console.log('[GitHub freshscan] MutationObserver 检测到新增节点');
               break;
             }
           }
         }
       }
+
+      // 检查属性变化（新增）
+      if (mutation.type === 'attributes' && !shouldRun) {
+        const target = mutation.target;
+        // 检查是否是时间相关的属性变化
+        if ((mutation.attributeName === 'datetime' && target.hasAttribute('datetime')) ||
+            (mutation.attributeName === 'title' && target.hasAttribute('title') &&
+             target.getAttribute('title').includes('GMT'))) {
+          shouldRun = true;
+          console.log('[GitHub freshscan] MutationObserver 检测到属性变化:', mutation.attributeName);
+        }
+      }
+
       if (shouldRun) break;
     }
 
     if (shouldRun && !isProcessing) {
-      console.log('[GitHub freshscan] MutationObserver 检测到 DOM 变化，执行脚本');
+      console.log('[GitHub freshscan] MutationObserver 触发脚本执行');
       runScript();
     }
   }, 300)); // 减少 debounce 延迟从 500ms 到 300ms
 
-  // 开始观察 - 只观察主要内容区域
+  // 开始观察 - 只观察主要内容区域，增加属性监听
   const targetNode = document.querySelector('main') || document.body;
   mutationObserver.observe(targetNode, {
     childList: true,
-    subtree: true
+    subtree: true,
+    attributes: true, // 新增：监听属性变化
+    attributeFilter: ['datetime', 'title'] // 新增：只监听这两个属性
   });
 
   // === 初始化设置面板 ===
