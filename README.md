@@ -5,19 +5,19 @@
 ---
 
 <div align="center">
-  <img src="./project.png" alt="项目页面示例" width="880" />
+  <img src="./images/project.png" alt="项目页面示例" width="880" />
   <br />
   <sub>项目页面示例</sub>
 </div>
 
 <div align="center">
-  <img src="./search.png" alt="搜索页面示例" width="880" />
+  <img src="./images/search.png" alt="搜索页面示例" width="880" />
   <br />
   <sub>搜索页面示例</sub>
 </div>
 
 <div align="center">
-  <img src="./setting.png" alt="设置页面示例" width="880" />
+  <img src="./images/setting.png" alt="设置页面示例" width="880" />
   <br />
   <sub>设置页面示例</sub>
 </div>
