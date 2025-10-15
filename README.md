@@ -89,6 +89,10 @@ Apache License 2.0
 
 欢迎提交 Issue 和 Pull Request！
 
+### 鸣谢
+
+项目部分功能参考了 [GitHub-Freshness](https://github.com/rational-stars/GitHub-Freshness)，特此鸣谢！
+
 ---
 
 ## English
@@ -175,3 +179,7 @@ Apache License 2.0
 ### Contributing
 
 Issues and Pull Requests are welcome!
+
+### Acknowledgments
+
+Parts of this project were inspired by [GitHub-Freshness](https://github.com/rational-stars/GitHub-Freshness). Special thanks!
